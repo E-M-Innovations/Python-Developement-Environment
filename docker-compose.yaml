@@ -1,0 +1,14 @@
+version: "3.8"  # Specifies the version of the Docker Compose file format being used.
+
+services:  # Begins the definition of the services section.
+  poetry-test:  # Defines a service named "poetryTest".
+    build:  # Specifies the build configuration for the service.
+      context: .  # Sets the build context to the current directory.
+      dockerfile: Dockerfile  # Specifies the Dockerfile to use for building the image.
+      args:  # Defines build arguments for the Docker build.
+        - DOCS_EXTRA=true  # Sets the value of the DOCS_EXTRA argument to the value of the DOCS_EXTRA environment variable. If the variable is not set, the default value is false.
+    ports:  # Specifies port mapping for the service.
+      - 8000:8000  # Maps port 8000 on the host to port 8000 in the container.
+    volumes:  # Specifies volume mapping for the service.
+      - ./docs:/app/docs  # Maps the ./docs directory on the host to the /app/docs directory in the container.
+
