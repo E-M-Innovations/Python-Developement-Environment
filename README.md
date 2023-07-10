@@ -1,4 +1,4 @@
-# Python Development Environment with Automated Documentation, Seamless Unit Testing, and Efficient Dependency Management
+# Python Dev Environment with Docker, Sphinx, Pytest, Cython & Poetry Dependency Management
 
 This project aims to create a containerized Python Development environment that incorporates automated documentation, seamless unit testing, and efficient dependency management. The environment utilizes popular tools like Sphinx, pytest, and poetry to enhance the development workflow.
 
