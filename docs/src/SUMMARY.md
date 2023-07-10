@@ -1,3 +1,4 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
+- [Purpose ](./purpose.md)
+- [Project Design](./project_design.md)
