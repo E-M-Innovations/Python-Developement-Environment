@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="purpose.html"><strong aria-hidden="true">1.</strong> Purpose </a></li><li class="chapter-item expanded "><a href="project_design.html"><strong aria-hidden="true">2.</strong> Project Design</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -167,46 +167,78 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
-<p>Testing!</p>
-<pre><code class="language-mermaid">graph TB
+                        <h1 id="purpose"><a class="header" href="#purpose">Purpose</a></h1>
+<p>The project aims to establish a Python Development environment that encompasses automated documentation, seamless unit testing, and efficient dependency management. Moreover, all these functionalities are containerized using Docker.  We will be utilizing specific tools and dependencies, namely Sphinx for automated documentation, pytest for unit testing, and poetry for dependency management.</p>
+<p>To achieve this, we will create a Dockerfile that defines the instructions for building the Docker image. The Docker image will encapsulate the entire Python Development environment, including the necessary dependencies and configurations for Sphinx, pytest, and poetry.</p>
+<p>Sphinx, a widely-used documentation generator, will be integrated into the environment to automate the documentation process. It will allow developers to write human-readable documentation alongside their Python code and generate HTML, PDF, or other documentation formats effortlessly.</p>
+<p>For seamless unit testing, the environment will incorporate pytest, a popular testing framework in the Python ecosystem. Developers can easily write test cases using pytest's expressive syntax, run tests, and obtain comprehensive test reports to ensure the reliability and correctness of their code.</p>
+<p>To streamline dependency management, the environment will leverage poetry, a powerful dependency management tool for Python. Poetry simplifies the process of defining and resolving dependencies, enabling developers to manage project dependencies, handle versioning, and ensure consistency across different environments.</p>
+<p>Combining these tools and dependencies, we will configure the Docker image to include all the necessary components for a robust Python Development environment. This Docker image can be easily shared, distributed, and deployed across various systems and platforms, ensuring consistency and reproducibility in the development process.</p>
+<p>In summary, the project aims to establish a Python Development environment that encompasses automated documentation, seamless unit testing, and efficient dependency management. Through the use of Docker and specific tools like Sphinx, pytest, and poetry, we will create a containerized environment that enhances the development experience and facilitates collaboration among developers.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="project-design"><a class="header" href="#project-design">Project Design</a></h1>
+<p>We have a few resources at our disposal for our project. The first link is a tutorial on how to integrate Cython, Sphinx and Poetry all together. This will be a great starting point for us to get our project off the ground. The second link is how to create a Poetry environment within Docker and manage dependencies. This will be a great way to ensure our environment is configured properly and that everything runs smoothly. With these two links, we should have all we need to get our project up and running.</p>
+<p>Sources: </p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/57988721/poetry-sphinx-cython">Using Cython + Poetry + Sphinx</a></li>
+<li><a href="https://stackoverflow.com/questions/53835198/integrating-python-poetry-with-docker">Integrating Python Poetry with Docker</a></li>
+</ul>
+<h2 id="the-design-thus-far"><a class="header" href="#the-design-thus-far">The Design Thus Far:</a></h2>
+<p>The main objectives are to create a design for incorporating Poetry within a Docker environment.</p>
+<ul>
+<li>Maintain separate directories for PyTest test files (<code>tests/</code>) and Sphinx documentation (<code>docs/</code>) on the host machine during development.</li>
+<li>Avoid directly including the test files and documentation in the Docker image.</li>
+<li>Utilize Poetry to manage dependencies within the Docker environment.</li>
+<li>Ensure that the Docker image is configured to access the test files and documentation directories from the host machine.</li>
+<li>Have the Sphinx output <code>index.html</code> auto-build when there are changes to the code and have it only be visible on the host machine.</li>
+<li>The PyTest test files (<code>tests/</code>)  could be executed within the Docker image with Cython and Python files alike.</li>
+</ul>
+<p><strong>Context:</strong></p>
+<p>Given that Docker is being employed for my development environment and Poetry for managing dependencies, it is our objective to establish a streamlined workflow whereby the PyTest test files and Sphinx documentation directories are retained on the host machine while only code and its associated dependencies reside within the Docker image. This strategy facilitates seamless testing execution in a Docker setting whilst also guaranteeing updated documentation generation by Sphinx.</p>
+<p><strong>Directory Structure:</strong></p>
+<pre><code>Host Machine:
+├── project/
+|   ├── poetry.lock
+|   ├── pyproject.toml
+│   ├── code/
+│   │   ├── file1.py
+│   │   ├── file2.py
+|   |   ├── cythonfile.pyx
+│   │   └── ...
+│   ├── tests/
+│   │   ├── test_file1.py
+│   │   ├── test_file2.py
+│   │   └── ...
+│   └── docs/
+│       ├── conf.py
+│       ├── index.rst
+│       ├── index.html (Output)
+│       └── ...
+└── Dockerfile
 
-modifyPoetry(Modify Integrating Python Poetry with Docker)
-enableEnv(Enable virtual environments)
-createPoetry(Create poetry installation)
-addSphinx(Add commands for Sphinx setup)
-searchVolumes(Volumes)
-createPoetryVolumes(Poetry files)
-createSphinxVolumes(Sphinx files)
-createCythonVolumes(Cython files)
-verifyContainer(Verify Docker Container)
-installDependency(Install Dependencies)
-
-modifyPoetry --&gt; createPoetry
-createPoetry --&gt; enableEnv
-enableEnv --&gt; installDependency
-installDependency --&gt; addSphinx
-modifyPoetry --&gt; searchVolumes
-searchVolumes --&gt; createPoetryVolumes
-searchVolumes --&gt; createSphinxVolumes
-searchVolumes --&gt; createCythonVolumes
-createPoetryVolumes --&gt; verifyContainer
-createSphinxVolumes --&gt; verifyContainer
-createCythonVolumes --&gt; verifyContainer
-addSphinx --&gt; verifyContainer
-
-style modifyPoetry fill:#F2DEDE,stroke:#A94442,stroke-width:4px
-style verifyContainer fill:#F2DEDE,stroke:#A94442,stroke-width:4px
-style createPoetry fill:#DFF0D8,stroke:#3C763D,stroke-width:2px 
-style searchVolumes fill:#DFF0D8,stroke:#3C763D,stroke-width:2px
-style createCythonVolumes fill:#DFF0D8,stroke:#3C763D,stroke-width:2px
-style enableEnv fill:#ADD8E6,stroke:#3C763D,stroke-width:2px
-style installDependency fill:#ADD8E6,stroke:#3C763D,stroke-width:2px
-style addSphinx fill:#ADD8E6,stroke:#3C763D,stroke-width:2px
-style createPoetryVolumes fill:#ADD8E6,stroke:#3C763D,stroke-width:2px
-style createSphinxVolumes fill:#ADD8E6,stroke:#3C763D,stroke-width:2px
-style createCythonVolumes fill:#ADD8E6,stroke:#3C763D,stroke-width:2px
+Docker Machine:
+└── code/
+		├── poetry.lock
+		├── pyproject.toml
+    ├── file1.py
+    ├── file2.py
+    ├── cythonfile.pyx
+    └── ...
 </code></pre>
+<p>We would like to figure out the design for the following:</p>
+<ul>
+<li>Setting up Poetry with Docker by
+<ul>
+<li>Pin the version of Poetry to ensure compatibility and prevent build issues.</li>
+<li>Pin the version of the pyproject.toml file to maintain consistency.</li>
+<li>Copy the poetry.lock and pyproject.toml files into the Docker image for dependency management.</li>
+<li>Enable virtual environments to isolate dependencies within the Docker environment.</li>
+<li>Separate dependencies for development and production environments by passing arguments during the build process to install the required sets of dependencies.</li>
+</ul>
+</li>
+<li>Configure Cython to work seamlessly with auto-documentation using Sphinx and ensure compatibility with Pytest.</li>
+<li>Set up Sphinx to auto-build on the host machine, possibly by using bind mounts for efficient file synchronization.</li>
+<li>Configure Pytest to run tests exclusively on the Docker machine, potentially utilizing volumes for seamless access to the test files.</li>
+</ul>
 
                     </main>
 
