@@ -172,8 +172,10 @@
 <ul>
 <li><a href="https://stackoverflow.com/questions/57988721/poetry-sphinx-cython">Using Cython + Poetry + Sphinx</a></li>
 <li><a href="https://stackoverflow.com/questions/53835198/integrating-python-poetry-with-docker">Integrating Python Poetry with Docker</a></li>
+<li><a href="https://hub.docker.com/r/sphinxdoc/sphinx">Docker Sphinx Image</a></li>
+<li><a href="https://docs.docker.com/language/java/run-tests/#multi-stage-dockerfile-for-testing">Multi-stage Dockerfile for testing</a></li>
 </ul>
-<h2 id="the-design-thus-far"><a class="header" href="#the-design-thus-far">The Design Thus Far:</a></h2>
+<h2 id="project-specifications"><a class="header" href="#project-specifications">Project Specifications:</a></h2>
 <p>The main objectives are to create a design for incorporating Poetry within a Docker environment.</p>
 <ul>
 <li>Maintain separate directories for PyTest test files (<code>tests/</code>) and Sphinx documentation (<code>docs/</code>) on the host machine during development.</li>
@@ -207,29 +209,70 @@
 └── Dockerfile
 
 Docker Machine:
-└── code/
-		├── poetry.lock
-		├── pyproject.toml
+└── app/
+    ├── poetry.lock
+    ├── pyproject.toml
     ├── file1.py
     ├── file2.py
     ├── cythonfile.pyx
-    └── ...
+    └── test/
+        ├── test_file1.py
+        ├── test_file2.py
+        └── ...
 </code></pre>
-<p>We would like to figure out the design for the following:</p>
+<h2 id="design-structure"><a class="header" href="#design-structure">Design Structure</a></h2>
+<p>This setup ensures compatibility and consistency by pinning versions and files. It uses Docker to isolate dependencies, supports Cython with GCC compiler, auto-builds Sphinx documentation, and enables interactive Pytest testing while optionally removing containers upon exit. <code>base</code> Image consists of setting up <code>Poetry</code>, <code>Cython</code> , and <code>Sphinx</code>. The <code>test</code> image contains the <code>base</code> image with the <code>pytest</code> testing capabilities </p>
 <ul>
-<li>Setting up Poetry with Docker by
+<li><strong>Setting up <code>Poetry</code>:</strong>
+To ensure compatibility and consistency, pin the Poetry version and <code>pyproject.toml</code> file. Add <code>/src</code> to the Python path and copy <code>poetry.lock</code> and <code>pyproject.toml</code> files for dependency management. Enable virtual environments for isolating dependencies within Docker. Separate development and production dependencies using build process arguments for precise installation.
 <ul>
 <li>Pin the version of Poetry to ensure compatibility and prevent build issues.</li>
-<li>Pin the version of the pyproject.toml file to maintain consistency.</li>
-<li>Copy the poetry.lock and pyproject.toml files into the Docker image for dependency management.</li>
+<li>Pin the version of the <code>pyproject.toml</code> file to maintain consistency.
+<ul>
+<li>Add  <code>/src</code> directory to the Python path</li>
+</ul>
+</li>
+<li>Copy the <code>poetry.lock</code> and <code>pyproject.toml</code> files into the Docker image for dependency management.</li>
 <li>Enable virtual environments to isolate dependencies within the Docker environment.</li>
 <li>Separate dependencies for development and production environments by passing arguments during the build process to install the required sets of dependencies.</li>
 </ul>
 </li>
-<li>Configure Cython to work seamlessly with auto-documentation using Sphinx and ensure compatibility with Pytest.</li>
-<li>Set up Sphinx to auto-build on the host machine, possibly by using bind mounts for efficient file synchronization.</li>
-<li>Configure Pytest to run tests exclusively on the Docker machine, potentially utilizing volumes for seamless access to the test files.</li>
+<li><strong>Setting up <code>Cython</code>:</strong>
+<ul>
+<li>Install the GCC compiler from the Dockerfile</li>
+<li>pip install <code>Cython</code>(from <code>poetry.lock</code> or <code>pyproject.toml</code>)</li>
 </ul>
+</li>
+<li><strong>Setting up <code>Sphinx</code> to auto-build documentation:</strong>
+Utilize the official Sphinx Docker image to generate HTML documentation automatically by running <code>docker run --rm -v /path/to/document:/docs sphinxdoc/sphinx make html</code>. The command binds the local <code>/path/to/document</code> to the <code>/docs</code> directory in the container, producing output in <code>/path/to/document/_build/html</code>.
+<ul>
+<li>Create sphinx documents in docker: <a href="https://hub.docker.com/r/sphinxdoc/sphinx">Sphinx-Docker</a>
+<ul>
+<li>We could create a bash command when the user runs sphinx make html it could execute the command: <code>docker run --rm -v /path/to/document:/docs sphinxdoc/sphinx make html</code>
+<ul>
+<li><code>docker run</code>: Run a Docker container.</li>
+<li><code>-rm</code>: Automatically remove the container after it exits.</li>
+<li><code>v /path/to/document:/docs</code>: Bind mount the local directory <code>/path/to/document</code> into the container at <code>/docs</code>.</li>
+<li><code>sphinxdoc/sphinx</code>: Use the official Sphinx Docker image.</li>
+<li><code>make html</code>: Generate HTML documentation using Sphinx, output placed in <code>/path/to/document/_build/html</code>.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Setting up <code>Pytest</code>:</strong>
+This Dockerfile employs a multi-stage setup to configure <code>Pytest</code> interactively by adding <strong><code>/tests</code></strong> to the Python path. It facilitates running tests in detached mode, enabling additional test execution, and optionally, ensures automatic removal of the Docker container upon exit using <code>--rm</code>.
+<ul>
+<li>Inherits from the <strong><code>base</code></strong> stage.</li>
+<li>Sets an environment variable <strong><code>PYTHONPATH</code></strong> to include <strong><code>/tests</code></strong> on the Python path.</li>
+<li>Copies the entire application source code (including tests) to the <strong><code>/app</code></strong> directory.</li>
+<li>Use a <code>CMD</code> command for <code>bash -c</code> to run pytest in interactive mode and (<strong><code>tail -f /dev/null</code></strong>) to keep the container running in detached mode.</li>
+<li><strong>Optional:</strong> have the Docker Container be immediately removed after exiting with the use of <code>--rm</code> during the run stage.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Requirements:</strong> <code>Cython(.pyx)</code> and <code>Python(.py)</code> files should be compatible.</p>
 
                     </main>
 
