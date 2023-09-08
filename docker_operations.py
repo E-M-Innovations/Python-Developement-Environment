@@ -4,7 +4,9 @@ from pathlib import Path  # Importing the `Path` class from the `pathlib` module
 def start_container_from_compose(compose_file):
     try:
         # Running the `docker-compose` command to start containers in detached mode (-d flag)
-        subprocess.run(["docker-compose", "-f", compose_file, "up", "-d"], check=True)
+        subprocess.run(["docker-compose", "-f", compose_file, "up"], check=True)
+        # USe the -d option below for detached mode 
+        # subprocess.run(["docker-compose", "-f", compose_file, "up", "d"], check=True)
         print(f"Containers started successfully using Docker Compose: {compose_file}")
     except subprocess.CalledProcessError as e:
         # Handling any errors that occur during the process
@@ -33,13 +35,9 @@ def stop_and_remove_container_from_compose(compose_file):
 
 # Example usage
 compose_file = Path("docker-compose.yaml")  # Creating a `Path` object for the Docker Compose file path
-start = 1  # Set to 1 to start the containers from Docker Compose
+start = 1 # Set to 1 to start the containers from Docker Compose
 
 if start == 1:
     start_container_from_compose(compose_file)  # Calling the function to start the containers
 else:
     stop_and_remove_container_from_compose(compose_file)  # Calling the function to stop and remove the containers
-
-
-# Copies the binary_options directory from the host machine to the /app/binary_options directory inside the Docker image.
-# COPY binary_options/ /app/binary_options/
